@@ -1,0 +1,45 @@
+/* Task.module.css */
+.taskContainer {
+    margin: 8px;
+    padding: 10px;
+    border: 1px solid lightgrey;
+    border-radius: 2px;
+    background-color: white;
+    max-width: 600px;
+    width: 100%;
+}
+
+.taskTitle {
+    color: #333;
+}
+
+.taskLabel {
+    margin-top: 10px;
+    display: block;
+}
+
+.taskInput,
+.taskSelect,
+.taskTextarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.taskList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.taskListItem {
+    background-color: #f5f5f5;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
+.taskHistory {
+    margin-top: 15px;
+}
