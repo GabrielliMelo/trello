@@ -11,11 +11,17 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ id, title, taskIds, tasks }) => {
     return (
-        <div style={{ margin: 8 }}>
-            <h3>{title}</h3>
+        <div className="m-2 bg-gray-100 p-2 w-64 h-[650px]  w-[300px]">
+            <h3 className="text-lg font-medium mb-2 text-start pl-2 text-gray-600 transition-colors duration-300 hover:text-gray-800">
+                {title}
+            </h3>
             <Droppable droppableId={id}>
                 {(provided) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps} style={{ background: 'lightblue', padding: 8, width: 250, minHeight: 100 }}>
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="bg-gray-100 p-2 w-64 max-h-[600px] min-h-[600px] w-[280px] overflow-auto rounded" // Alterações aqui
+                    >
                         {taskIds.map((taskId, index) =>
                             <Task
                                 key={taskId}

@@ -1,10 +1,10 @@
 import React from 'react';
-import styles from './Task.module.css';
-
-// interface ContentProps {
-//     id: string;
-
-// }
+import { Draggable } from 'react-beautiful-dnd';
+import dayjs from 'dayjs';
+import Modal from '../Modal'
+import DropDowns from '../DropDowns'
+import { Menu } from '@headlessui/react'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
 interface TaskProps {
     id: string;
@@ -26,131 +26,127 @@ interface TaskProps {
     updateHistory: string[];
 }
 
-const Task: React.FC<TaskProps> = ({ id, title,
-    description,
+const Task: React.FC<TaskProps> = ({
+    id,
+    title,
     responsible,
-    manager,
     managerApproval,
     startDate,
     endDate,
     priority,
-    status,
-    timeEstimate,
-    comments,
     associatedProject,
-    subtasks,
-    attachments,
-    tags,
-    updateHistory, }) => {
+    description
+}) => {
 
-    const [showDetails, setShowDetails] = React.useState(false);
+    const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
-    const toggleDetails = () => {
-        setShowDetails(!showDetails);
+    const handleCardClick = (value: boolean): any => {
+        setIsModalOpen(value);
+    };
+
+
+    const formatDate = (dateString: string) => {
+        return dayjs(dateString).format('DD/MM/YYYY');
+    };
+
+    const getPriorityColor = (priority: string) => {
+        const colors: any = {
+            Alta: 'bg-red-500',
+            Média: 'bg-orange-500',
+            Baixa: 'bg-blue-500',
+        };
+        return colors[priority] || 'bg-gray-200';
+    };
+
+    const getApprovalColor = (approval: boolean) => {
+        return approval ? 'bg-green-500' : 'bg-red-500';
     };
 
     return (
-        <div className={styles.taskContainer}>
-            <h3 className={styles.taskTitle}>{title}</h3>
-            <p>{description}</p>
-
-            <label className={styles.taskLabel}>
-                Responsável:
-                <select name="responsible" className={styles.taskSelect}>
-                    {responsible.map((res: string) => <option key={res} value={res}>{res}</option>)}
-                </select>
-            </label>
-
-            <label className={styles.taskLabel}>
-                Gestor:
-                <select name="manager" className={styles.taskSelect}>
-                    {manager.map((mgr: string) => <option key={mgr} value={mgr}>{mgr}</option>)}
-                </select>
-            </label>
-
-            {
-                showDetails && (
-                    <>
-                        <label className={styles.taskLabel}>
-                            Aprovação do Gestor:
-                            <input type="checkbox" checked={managerApproval} />
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Data de Início:
-                            <input type="date" className={styles.taskInput} value={startDate} />
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Data de Conclusão:
-                            <input type="date" className={styles.taskInput} value={endDate} />
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Prioridade:
-                            <select name="priority" className={styles.taskSelect} value={priority}>
-                                <option value="Alta">Alta</option>
-                                <option value="Média">Média</option>
-                                <option value="Baixa">Baixa</option>
-                            </select>
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Status:
-                            <select name="status" className={styles.taskSelect} value={status}>
-                                <option value="To-do">To-do</option>
-                                <option value="Em Progresso">Em Progresso</option>
-                                <option value="Bloqueada">Bloqueada</option>
-                                <option value="Revisão">Revisão</option>
-                                <option value="Concluída">Concluída</option>
-                            </select>
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Estimativa de Tempo (horas):
-                            <input type="number" className={styles.taskInput} value={timeEstimate} />
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Comentários/Notas:
-                            <textarea className={styles.taskTextarea} value={comments}></textarea>
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Projeto Associado:
-                            <input type="text" className={styles.taskInput} value={associatedProject} />
-                        </label>
-
-                        <ul className={styles.taskList}>
-                            {subtasks.map((subtask: string) => <li className={styles.taskListItem} key={subtask}>{subtask}</li>)}
-                        </ul>
-
-                        <label className={styles.taskLabel}>
-                            Anexos:
-                            <input type="file" className={styles.taskInput} multiple />
-                        </label>
-
-                        <label className={styles.taskLabel}>
-                            Tags/Categorias:
-                            <input type="text" className={styles.taskInput} />
-                        </label>
-
-                        <div className={styles.taskHistory}>
-                            <h4>Histórico de Atualizações:</h4>
-                            <ul>
-                                {updateHistory.map((update: string) => <li key={update}>{update}</li>)}
-                            </ul>
+        <>
+            <Draggable draggableId={id} index={Number(id)}>
+                {(provided) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="bg-white shadow-lg rounded-lg p-4 mb-4"
+                        onClick={() => handleCardClick(true)}
+                    >
+                        <div className="bg-purple-200 text-purple-700 px-4 py-1 inline-block rounded-full text-sm font-medium mb-4">
+                            {associatedProject}
+                        </div>
+                        <h3 className="text-md font-semibold mb-2 truncate text-start">{title}</h3>
+                        <div className="flex items-center mb-2">
+                            <span className="text-gray-700 font-medium mr-2">Responsible:</span>
+                            {responsible.map(name => (
+                                <span className="text-sm text-gray-600 mr-1" key={name}>{name}</span>
+                            ))}
                         </div>
 
-                    </>
-                )
-            }
+                        <div className="flex justify-start items-center mb-2">
+                            <span className="text-gray-700 font-medium">Manager aproval:</span>
+                            <span className={`inline-block ${getApprovalColor(managerApproval)} text-white px-4 py-1 rounded-full text-sm ml-2`}>
+                                {managerApproval ? 'Sim' : 'Não'}
+                            </span>
+                        </div>
 
-            <button onClick={toggleDetails}>
-                {showDetails ? 'Ver Menos' : 'Ver Mais'}
-            </button>
+                        <div className="flex justify-start items-center">
+                            <span className="text-gray-700 font-medium">Prioridade:</span>
+                            <span className={`inline-block ${getPriorityColor(priority)} text-white px-4 py-1 rounded-full text-sm ml-2`}>
+                                {priority}
+                            </span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2 flex justify-start items-center">start Date: {formatDate(startDate)}</div>
+                        <div className="text-xs text-gray-500 mt-2 flex justify-start items-center">End Date: {formatDate(endDate)}</div>
 
-        </div>
+                    </div>
+                )}
+            </Draggable>
+            <Modal isOpen={isModalOpen} onToggleModal={() => handleCardClick(true)}>
+                <div className="bg-white p-4 flex justify-between items-center">
+                    <div className="flex items-center">
+                        <div className="relative">
+                            <img
+                                src="https://s2-galileu.glbimg.com/9uHHuZrRDHRZsgP3UKqx40thz-E=/0x0:800x450/888x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_fde5cd494fb04473a83fa5fd57ad4542/internal_photos/bs/2022/U/j/XrUuhZTZKvZEE7KWnglw/e.t.o-extraterrestre-foto-divulgacao-widelg.jpg"
+                                alt="User avatar"
+                                className="h-10 w-10 rounded-full"
+                            />
+                            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />
+                        </div>
+
+                        <button className="ml-4">
+                            +
+                        </button>
+                    </div>
+
+                    <div className="flex items-center">
+                        <button className="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
+                            <span>Clonar</span>
+                        </button>
+                        <div className="flex items-center">
+                            <Menu as="div" className="relative inline-block text-left">
+                                <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                    Opções
+                                    <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </Menu.Button>
+
+                                <DropDowns />
+                            </Menu>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div className="border-t border-gray-200 "></div>
+                <p className="text-sm font-bold mb-2">Título: {title}</p>
+                <p className="text-sm mb-2">Descrição: {description}</p>
+                <p className="text-sm mb-2">Responsável: {responsible.join(', ')}</p>
+                <p className="text-sm mb-2">Início: {formatDate(startDate)}</p>
+                <p className="text-sm mb-2">Conclusão: {formatDate(endDate)}</p>
+            </Modal>
+        </>
+
     );
 };
 
